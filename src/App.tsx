@@ -1,9 +1,24 @@
-function App() {
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import { AuthProvider, useAuth } from "./context/AuthContext"
+import Login from "./pages/Login"
+
+function AppRoutes() {
+  const { user } = useAuth()
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-      <h1 className="text-4xl font-bold text-orange-500">Drivo 🚛</h1>
-    </div>
+    <Routes>
+      <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
+      <Route path="/dashboard" element={user ? <div className="text-white p-8">Dashboard coming soon 🚛</div> : <Navigate to="/login" />} />
+      <Route path="*" element={<Navigate to="/login" />} />
+    </Routes>
   )
 }
 
-export default App
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </AuthProvider>
+  )
+}
