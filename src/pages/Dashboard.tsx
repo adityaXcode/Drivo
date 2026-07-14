@@ -121,6 +121,13 @@ export default function Dashboard() {
         >
           📋 View Trip History
         </button>
+        {/* AI Assistant Button */}
+<button
+  onClick={() => navigate("/ai")}
+  className="w-full py-4 rounded-2xl text-lg font-bold bg-purple-600 hover:bg-purple-700 transition"
+>
+  🤖 Drivo AI Assistant
+</button>
 
       </div>
     </div>
