@@ -1,3 +1,4 @@
+import WeatherCard from "../components/WeatherCard"
 import { useState, useRef } from "react"
 import { signOut } from "firebase/auth"
 import { useNavigate } from "react-router-dom"
@@ -92,6 +93,10 @@ export default function Dashboard() {
             </p>
           </div>
         </div>
+        {/* Weather Card */}
+{location && (
+  <WeatherCard lat={location.lat} lng={location.lng} />
+)}
 
         {/* Trip Button */}
         <button
