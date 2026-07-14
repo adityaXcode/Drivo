@@ -1,5 +1,6 @@
 import { useState, useRef } from "react"
 import { signOut } from "firebase/auth"
+import { useNavigate } from "react-router-dom"
 import { auth } from "../firebase"
 import { useAuth } from "../context/AuthContext"
 import { saveTrip } from "../services/tripService"
@@ -8,6 +9,7 @@ import HOSTimer from "../components/HOSTimer"
 
 export default function Dashboard() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [tripActive, setTripActive] = useState(false)
   const [saving, setSaving] = useState(false)
   const startTimeRef = useRef<Date | null>(null)
@@ -54,7 +56,10 @@ export default function Dashboard() {
       {/* Header */}
       <div className="bg-gray-800 px-6 py-4 flex justify-between items-center">
         <h1 className="text-xl font-bold text-orange-500">🚛 Drivo</h1>
-        <button onClick={() => signOut(auth)} className="text-gray-400 text-sm hover:text-white">
+        <button
+          onClick={() => signOut(auth)}
+          className="text-gray-400 text-sm hover:text-white"
+        >
           Logout
         </button>
       </div>
@@ -67,13 +72,18 @@ export default function Dashboard() {
         </div>
 
         {/* HOS Timer */}
-        <HOSTimer tripActive={tripActive} onTick={(s) => { secondsRef.current = s }} />
+        <HOSTimer
+          tripActive={tripActive}
+          onTick={(s) => { secondsRef.current = s }}
+        />
 
         {/* GPS Info */}
         <div className="bg-gray-800 rounded-2xl p-5 grid grid-cols-2 gap-4">
           <div>
             <p className="text-gray-400 text-sm">Distance</p>
-            <p className="text-2xl font-bold text-orange-500">{distanceKm.toFixed(1)} km</p>
+            <p className="text-2xl font-bold text-orange-500">
+              {distanceKm.toFixed(1)} km
+            </p>
           </div>
           <div>
             <p className="text-gray-400 text-sm">GPS Status</p>
@@ -88,7 +98,9 @@ export default function Dashboard() {
           onClick={tripActive ? handleEndTrip : handleStartTrip}
           disabled={saving}
           className={`w-full py-5 rounded-2xl text-xl font-bold transition ${
-            tripActive ? "bg-red-500 hover:bg-red-600" : "bg-orange-500 hover:bg-orange-600"
+            tripActive
+              ? "bg-red-500 hover:bg-red-600"
+              : "bg-orange-500 hover:bg-orange-600"
           } disabled:opacity-50`}
         >
           {saving ? "Saving..." : tripActive ? "⏹ End Trip" : "▶ Start Trip"}
@@ -100,6 +112,14 @@ export default function Dashboard() {
           className="w-full py-4 rounded-2xl text-lg font-bold bg-blue-600 hover:bg-blue-700 transition"
         >
           🗺 Open Navigation
+        </button>
+
+        {/* Trip History Button */}
+        <button
+          onClick={() => navigate("/trips")}
+          className="w-full py-4 rounded-2xl text-lg font-bold bg-gray-700 hover:bg-gray-600 transition"
+        >
+          📋 View Trip History
         </button>
 
       </div>
