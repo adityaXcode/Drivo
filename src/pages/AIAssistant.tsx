@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { askGemini } from "../services/geminiService"
+import { useVoice } from "../hooks/useVoice"
 
 interface Message {
   role: "user" | "ai"
@@ -19,12 +20,18 @@ export default function AIAssistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "ai",
-      text: "Namaste Driver! 🚛 Main Drivo AI hoon. Aapki kaise madad kar sakta hoon? Road safety, driving tips, ya kuch aur?",
+      text: "Namaste Driver! 🚛 Main Drivo AI hoon. Aap bol ke ya likh ke mujhse baat kar sakte hain!",
     },
   ])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
+  const [listening, setListening] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
+
+  const { startListening, speak } = useVoice((voiceText) => {
+    setListening(false)
+    sendMessage(voiceText)
+  })
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -39,6 +46,12 @@ export default function AIAssistant() {
     const reply = await askGemini(text)
     setMessages((prev) => [...prev, { role: "ai", text: reply }])
     setLoading(false)
+    speak(reply)
+  }
+
+  const handleVoice = () => {
+    setListening(true)
+    startListening()
   }
 
   return (
@@ -49,7 +62,7 @@ export default function AIAssistant() {
         <button onClick={() => navigate("/dashboard")} className="text-orange-500 text-xl">←</button>
         <div>
           <h1 className="text-lg font-bold">Drivo AI 🤖</h1>
-          <p className="text-gray-400 text-xs">Your personal road assistant</p>
+          <p className="text-gray-400 text-xs">Bol ke ya likh ke baat karo</p>
         </div>
       </div>
 
@@ -57,13 +70,11 @@ export default function AIAssistant() {
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div
-              className={`max-w-xs px-4 py-3 rounded-2xl text-sm ${
-                msg.role === "user"
-                  ? "bg-orange-500 text-white rounded-br-none"
-                  : "bg-gray-700 text-white rounded-bl-none"
-              }`}
-            >
+            <div className={`max-w-xs px-4 py-3 rounded-2xl text-sm ${
+              msg.role === "user"
+                ? "bg-orange-500 text-white rounded-br-none"
+                : "bg-gray-700 text-white rounded-bl-none"
+            }`}>
               {msg.text}
             </div>
           </div>
@@ -96,7 +107,7 @@ export default function AIAssistant() {
         ))}
       </div>
 
-      {/* Input */}
+      {/* Input + Voice */}
       <div className="px-4 py-4 bg-gray-800 flex gap-3">
         <input
           value={input}
@@ -105,6 +116,15 @@ export default function AIAssistant() {
           placeholder="Kuch bhi pucho..."
           className="flex-1 bg-gray-700 text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-sm"
         />
+        <button
+          onClick={handleVoice}
+          disabled={listening}
+          className={`px-4 py-3 rounded-xl font-bold transition ${
+            listening ? "bg-red-500 animate-pulse" : "bg-green-600 hover:bg-green-700"
+          }`}
+        >
+          {listening ? "🎙️" : "🎤"}
+        </button>
         <button
           onClick={() => sendMessage(input)}
           disabled={loading}
