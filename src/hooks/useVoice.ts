@@ -15,7 +15,6 @@ export function useVoice(onResult: (text: string) => void) {
     recognition.continuous = false
 
     recognition.start()
-
     recognition.onstart = () => console.log("Listening...")
     recognition.onresult = (event: any) => {
       const text = event.results[0][0].transcript
@@ -26,34 +25,39 @@ export function useVoice(onResult: (text: string) => void) {
     }
   }
 
-  const speak = (text: string) => {
-    window.speechSynthesis.cancel()
+  const speak = async (text: string) => {
+    try {
+      const response = await fetch(
+        "https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "xi-api-key": import.meta.env.VITE_ELEVENLABS_API_KEY,
+          },
+          body: JSON.stringify({
+            text: text,
+            model_id: "eleven_monolingual_v1",
+            voice_settings: {
+              stability: 0.5,
+              similarity_boost: 0.75,
+            },
+          }),
+        }
+      )
 
-    const utterance = new SpeechSynthesisUtterance(text)
-
-    // Best voice dhundho
-    const voices = window.speechSynthesis.getVoices()
-    
-    // Priority order mein voice select karo
-    const preferredVoice = 
-      voices.find(v => v.name.includes("Google UK English Female")) ||
-      voices.find(v => v.name.includes("Google US English")) ||
-      voices.find(v => v.name.includes("Microsoft Zira")) ||
-      voices.find(v => v.name.includes("Microsoft David")) ||
-      voices.find(v => v.lang === "en-IN") ||
-      voices.find(v => v.lang.startsWith("en"))
-
-    if (preferredVoice) {
-      utterance.voice = preferredVoice
-      console.log("Using voice:", preferredVoice.name)
+      const audioBlob = await response.blob()
+      const audioUrl = URL.createObjectURL(audioBlob)
+      const audio = new Audio(audioUrl)
+      audio.play()
+    } catch (error) {
+      console.error("ElevenLabs error:", error)
+      // Fallback to browser voice
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.lang = "en-IN"
+      utterance.rate = 0.85
+      window.speechSynthesis.speak(utterance)
     }
-
-    utterance.lang = "en-IN"
-    utterance.rate = 0.85
-    utterance.pitch = 1.0
-    utterance.volume = 1.0
-
-    window.speechSynthesis.speak(utterance)
   }
 
   return { startListening, speak }
