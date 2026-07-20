@@ -4,7 +4,7 @@ export function useVoice(onResult: (text: string) => void) {
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
 
     if (!SpeechRecognition) {
-      alert("Ye browser voice support nahi karta. Chrome use karo.")
+      alert("Chrome browser use karo voice ke liye")
       return
     }
 
@@ -16,21 +16,13 @@ export function useVoice(onResult: (text: string) => void) {
 
     recognition.start()
 
-    recognition.onstart = () => {
-      console.log("Listening started...")
-    }
-
+    recognition.onstart = () => console.log("Listening...")
     recognition.onresult = (event: any) => {
       const text = event.results[0][0].transcript
-      console.log("Heard:", text)
       onResult(text)
     }
-
     recognition.onerror = (event: any) => {
       console.error("Voice error:", event.error)
-      if (event.error === "not-allowed") {
-        alert("Microphone permission do — browser settings mein jaake allow karo.")
-      }
     }
   }
 
@@ -39,16 +31,27 @@ export function useVoice(onResult: (text: string) => void) {
 
     const utterance = new SpeechSynthesisUtterance(text)
 
+    // Best voice dhundho
     const voices = window.speechSynthesis.getVoices()
-    const indianVoice = voices.find(
-      (v) => v.lang === "en-IN" || v.name.includes("India")
-    )
-    if (indianVoice) utterance.voice = indianVoice
+    
+    // Priority order mein voice select karo
+    const preferredVoice = 
+      voices.find(v => v.name.includes("Google UK English Female")) ||
+      voices.find(v => v.name.includes("Google US English")) ||
+      voices.find(v => v.name.includes("Microsoft Zira")) ||
+      voices.find(v => v.name.includes("Microsoft David")) ||
+      voices.find(v => v.lang === "en-IN") ||
+      voices.find(v => v.lang.startsWith("en"))
+
+    if (preferredVoice) {
+      utterance.voice = preferredVoice
+      console.log("Using voice:", preferredVoice.name)
+    }
 
     utterance.lang = "en-IN"
     utterance.rate = 0.85
-    utterance.pitch = 1.1
-    utterance.volume = 1
+    utterance.pitch = 1.0
+    utterance.volume = 1.0
 
     window.speechSynthesis.speak(utterance)
   }
