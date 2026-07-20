@@ -4,6 +4,7 @@ import Login from "./pages/Login"
 import Dashboard from "./pages/Dashboard"
 import TripHistory from "./pages/TripHistory"
 import AIAssistant from "./pages/AIAssistant"
+import Expenses from "./pages/Expenses"
 
 function AppRoutes() {
   const { user } = useAuth()
@@ -13,6 +14,7 @@ function AppRoutes() {
       <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
       <Route path="/trips" element={user ? <TripHistory /> : <Navigate to="/login" />} />
       <Route path="/ai" element={user ? <AIAssistant /> : <Navigate to="/login" />} />
+      <Route path="/expenses" element={user ? <Expenses /> : <Navigate to="/login" />} />
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   )

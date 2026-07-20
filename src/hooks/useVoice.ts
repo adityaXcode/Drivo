@@ -28,7 +28,7 @@ export function useVoice(onResult: (text: string) => void) {
   const speak = async (text: string) => {
     try {
       const response = await fetch(
-        "https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM",
+        "https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB",
         {
           method: "POST",
           headers: {
@@ -37,7 +37,7 @@ export function useVoice(onResult: (text: string) => void) {
           },
           body: JSON.stringify({
             text: text,
-            model_id: "eleven_monolingual_v1",
+            model_id: "eleven_turbo_v2_5",
             voice_settings: {
               stability: 0.5,
               similarity_boost: 0.75,

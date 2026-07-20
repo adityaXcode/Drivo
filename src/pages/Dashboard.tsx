@@ -133,6 +133,13 @@ export default function Dashboard() {
 >
   🤖 Drivo AI Assistant
 </button>
+{/* Expenses Button */}
+<button
+  onClick={() => navigate("/expenses")}
+  className="w-full py-4 rounded-2xl text-lg font-bold bg-green-600 hover:bg-green-700 transition"
+>
+  💰 Expense Tracker
+</button>
 
       </div>
     </div>
